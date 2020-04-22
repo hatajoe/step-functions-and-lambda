@@ -1,0 +1,23 @@
+version: '3'
+services:
+  sam:
+    build:
+      context: ./lambda
+      dockerfile: Dockerfile
+    command: ./run.sh
+    volumes:
+      - ./lambda:/var/opt/
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - VOLUME=$PWD
+
+  step-functions:
+    build:
+      context: ./step-functions
+      dockerfile: Dockerfile
+    ports:
+      - '8083:8083'
+    env_file:
+      - aws-stepfunctions-local-credentials.txt
+    depends_on:
+      - sam
